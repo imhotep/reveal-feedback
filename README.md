@@ -14,31 +14,31 @@ In order to use the feedback app you need to setup a few things
 
 Create a new database, give it a name (such as *keynote*) and add this document:
 
-        {
-            id: "current",
-            slide_id: null
-        }
+    {
+        id: "current",
+        slide_id: null
+    }
 
 This document will be used to determine which slide is current so that people can vote it up.
 
 create a new design document and call it _\_design/presentation_ . Create a new view and call it _all\_docs_ and add this code to it
 
-        function(doc) {
-          if(doc._id != "current") {
-            emit(null, doc);
-          }
-        }
+    function(doc) {
+      if(doc._id != "current") {
+        emit(null, doc);
+      }
+    }
 
 This view allows the stats app to generate its chart
 
 create another view and call it *docs\_by\_indices* and add this code to it:
 
-        function(doc) {
-          if(doc.indexh != undefined && doc.indexv != undefined) {
-            var key = doc.indexh + '-' + doc.indexv;
-            emit(key, doc);
-          }
-        }
+    function(doc) {
+      if(doc.indexh != undefined && doc.indexv != undefined) {
+        var key = doc.indexh + '-' + doc.indexv;
+        emit(key, doc);
+      }
+    }
 
 This allows reveal.js to create a new slide document if it does not exist or update the current slide with the right ID if the slide exists. 
 
@@ -63,14 +63,14 @@ Hosting
 I like to host all these web applications on the same server because they're very light client-side apps. I use [nginx](http://nginx.org).
 You could use **proxy_pass** if you don't want to deal with couchdb's default port (5984). A firewall rule might prevent you from using a port different than 80/443 OR you might not want to open that port on your server.
 
-        upstream couchdb {
-                server localhost:5984;
+    upstream couchdb {
+            server localhost:5984;
+    }
+
+    server {
+
+        location /keynote2 {
+                proxy_pass http://couchdb;
         }
 
-        server {
-
-            location /keynote2 {
-                    proxy_pass http://couchdb;
-            }
-
-        }
+    }
