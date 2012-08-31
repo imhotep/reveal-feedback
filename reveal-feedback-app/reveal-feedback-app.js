@@ -4,56 +4,9 @@ var host = "http://ec2-184-72-173-33.compute-1.amazonaws.com/keynote";
 $(document).ready(function() {
     $(".button").click(function() {
         onLikeClick();
-    })
+    });
+    setInterval(updateCurrentSlide, 1000);
 });
-
-//function testCreate() {
-//    var slide = {
-//        liked: 0,
-//        title: 'Slide Test ' + Math.floor(Math.random()*11)
-//    };
-//
-//    $.ajax({
-//      url: host,
-//      type: 'POST',
-//      contentType: 'application/json',
-//      data: JSON.stringify(slide),
-//      dataType: 'json',
-//      success: function(result) {
-//          // create new slide
-//          console.log('Slide added!', result);
-//          var slideId = result.id;
-//          // get current slide document
-//          $.ajax({
-//            url: host + '/current',
-//            dataType: 'json',
-//            success: function(current) {
-//                // update current slide document
-//                current.slide_id = slideId;
-//                $.ajax({
-//                  url: host + '/current',
-//                  type: 'PUT',
-//                  contentType: 'application/json',
-//                  data: JSON.stringify(current),
-//                  success: function(result) {
-//                      console.log('Current slide updated to '+slideId);
-//                      console.log(JSON.stringify(result));
-//                  },
-//                  error: function(e) {
-//                      alert('error ' + JSON.stringify(e));
-//                  }
-//                });
-//            },
-//            error: function() { 
-//                alert('error');
-//            }
-//          });
-//      },
-//      error: function(e) {
-//          alert('error ' + JSON.stringify(e));
-//      }
-//    });
-//};
 
 function showNotification(msg) {
     $('.message').html(msg);
@@ -75,7 +28,7 @@ function likeSlide(slide) {
           console.log(JSON.stringify(result));
       },
       error: function(e) {
-          alert('error ' + JSON.stringify(e));
+          alert('likeSlide: An error occured ' + JSON.stringify(e));
       }
     });
 }
@@ -89,13 +42,12 @@ function getSlide(slideId) {
           likeSlide(slide);
       },
       error: function() { 
-          alert('error');
+          alert('getSlide: An error occured');
       }
     });
 }
 
 function onLikeClick() {
-//    testCreate();
     $.ajax({
       url: host + '/current',
       dataType: 'json',
@@ -104,7 +56,29 @@ function onLikeClick() {
           getSlide(current.slide_id);
       },
       error: function() { 
-          alert('error');
+          alert('onLike: An error occured');
+      }
+    });
+}
+
+function updateCurrentSlide() {
+    $.ajax({
+      url: host + '/current',
+      dataType: 'json',
+      success: function(current) {
+        $.ajax({
+          url: host + '/' + current.slide_id,
+          dataType: 'json',
+          success: function(slide) {
+              $('#currentSlide').html(slide.title);
+          },
+          error: function() { 
+              alert('getSlideTile: An error occured');
+          }
+        });
+      },
+      error: function() { 
+          alert('updateCurrentSlide: An error occured');
       }
     });
 }
